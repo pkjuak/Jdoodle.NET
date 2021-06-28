@@ -1,8 +1,10 @@
  private  static void ManipulatePdf(string src, string dest)
         {
+            //Load the license file to use cleanup features
+            LicenseKey.LoadLicenseFile("license.xml");
             using (var pdfDocument = new PdfDocument(new PdfReader(src), new PdfWriter(dest)))
             {
-                LicenseKey.LoadLicenseFile("license.xml");
+               
                 var form = PdfAcroForm.GetAcroForm(pdfDocument, false);
                 form?.FlattenFields();
 
