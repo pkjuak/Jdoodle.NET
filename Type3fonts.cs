@@ -14,7 +14,9 @@ namespace TYPE3TEST
         {
             //Load the license file to use cleanup features
             LicenseKey.LoadLicenseFile("license.xml");
+         
             var properties = new StampingProperties();
+         
             using (var pdfDocument =
                 new PdfDocument(new PdfReader("base.pdf"),
                     new PdfWriter("cleanupResult.pdf"), properties))
