@@ -1,6 +1,20 @@
-    /** Merges a PDF with a broken outline structure */
-    public void MergeOutlines() 
-            {
+using iText.Kernel.Pdf;
+using iText.Kernel.Utils;
+
+namespace Release_7._2._1_examples
+{
+    internal class FailSafeProcessOutlines
+    {
+        public static void Main(string[] args)
+        {
+            new FailSafeProcessOutlines().MergeOutlines();
+        }
+        
+        /**
+         * Merges a PDF with a broken outline structure
+         */
+        public void MergeOutlines() 
+        {
             using (var inputDoc = new PdfDocument(new PdfReader("infiniteLoopInOutlineStructure.pdf"))) 
             using (var outputDoc = new PdfDocument(new PdfWriter("result.pdf")))
             {
@@ -9,3 +23,5 @@
                 merger.Close();
             }
         }
+    }
+}
