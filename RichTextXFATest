@@ -1,0 +1,32 @@
+using iText.Licensing.Base;
+using iTextSharp.tool.xml.xtra.xfa;
+
+namespace XFATests;
+{
+  public class RichTextXFATest
+  {
+    private static string LICENSE = "license.json";
+
+    public static void ManipulatePdf(string src, string dest)
+    {
+      LicenseKey.LoadLicenseFile(new FileStream(LICENSE, FileMode.Open));
+
+      XFAFlattenerProperties flattenerProperties = new XFAFlattenerProperties()
+        .SetPdfVersion(XFAFlattenerProperties.PDF_1_7)
+        .CreateXmpMetaData()
+        .SetTagged()
+        .SetMetaData(
+          new MetaData()
+            .SetAuthor("iText Samples")
+            .SetLanguage("EN")
+            .SetSubject("Showing off our flattening skills")
+            .SetTitle("Flattened XFA"));
+
+      XFAFlattener xfaf = new XFAFlattener()
+        .SetFlattenerProperties(flattenerProperties);
+
+      xfaf.Flatten(new FileStream(src, FileMode.Open, FileAccess.Read),
+        new FileStream(dest, FileMode.Create, FileAccess.Write));
+    }
+  }
+}
