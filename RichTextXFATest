@@ -6,10 +6,12 @@ namespace XFATests;
   public class RichTextXFATest
   {
     private static string LICENSE = "license.json";
+    
     static void Main(string[] args)
     {
       ManipulatePdf("richTextFieldNoDataBinding.pdf", "result.pdf")
     }
+    
     public static void ManipulatePdf(string src, string dest)
     {
       LicenseKey.LoadLicenseFile(new FileStream(LICENSE, FileMode.Open));
