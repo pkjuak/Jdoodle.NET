@@ -1,0 +1,104 @@
+using iText.Kernel.Colors;
+using iText.Kernel.Geom;
+using iText.Kernel.Pdf;
+using iText.Layout;
+using iText.Layout.Borders;
+using iText.Layout.Element;
+using iText.Layout.Layout;
+using iText.Layout.Properties;
+
+namespace SUP_36259
+{
+    public class HeightCalculationTest
+    {
+        public static void Main(string[] args)
+        {
+            using (var pdfDoc = new PdfDocument(new PdfWriter("test.pdf")))
+            using (var doc = new Document(pdfDoc, new PageSize(700, 700)))
+            {
+                // This is how table looks like if no height property is set 
+                AddTable(doc, 504, "RETIREMENT PLANNING: BECAUSE YOU CAN’T BE A FINANCIAL PLANNER FOREVER.", -1);
+
+                // Here we set value from pre layout as height. We expect that this table shall be equal to the previous one 
+                AddTable(doc, 360, "RETIREMENT PLANNING: BECAUSE YOU CAN’T BE A FINANCIAL PLANNER FOREVER.", 0);
+
+                // Here we set 100 as height. We expect that this will be enough, and all text will be placed 
+                AddTable(doc, 216, "RETIREMENT PLANNING: BECAUSE YOU CAN’T BE A FINANCIAL PLANNER FOREVER.", 100);
+
+                // Here we set 102 as height. We expect that this will be enough, and all text will be placed 
+                AddTable(doc, 72, "RETIREMENT PLANNING: BECAUSE YOU CAN’T BE A FINANCIAL PLANNER FOREVER.", 102);
+            }
+        }
+
+        public static void AddTable(Document doc, int y, string text, int heightParam)
+        {
+            const float width = 585f;
+            const float fontSize = 32f;
+
+            var table = new Table(1);
+            table.SetWidth(width);
+            table.SetFixedLayout();
+
+            var ph = new Paragraph();
+
+            var txt = new Text(text);
+            txt.SetFontSize(fontSize);
+
+            ph.Add(txt);
+
+            ph.SetFixedLeading(fontSize);
+
+            var cell = new Cell();
+            cell.SetPaddingTop(0f);
+            cell.SetPaddingBottom(0f);
+            cell.Add(ph);
+            cell.SetBackgroundColor(ColorConstants.LIGHT_GRAY);
+            cell.SetBorder(null);
+
+            table.AddCell(cell);
+
+            // Retrieve the dimensions of the cell we just added 
+            var result = table.CreateRendererSubTree()
+                .SetParent(doc.GetRenderer())
+                .Layout(new LayoutContext(
+                    new LayoutArea(
+                        1,
+                        new Rectangle(0, 0, width, 10000.0F))));
+
+            var heightStr = "Natural";
+
+            if (heightParam == 0)
+            {
+                var rowHeight = result.GetOccupiedArea().GetBBox().GetHeight();
+
+                cell.SetHeight(rowHeight);
+
+                heightStr = "Calculated " + rowHeight;
+            }
+            else if (heightParam > 0)
+            {
+                cell.SetHeight(heightParam);
+                heightStr = "Explicit " + heightParam;
+            }
+            
+            table.SetFixedPosition((float)36, (float)y, width);
+
+            doc.Add(table);
+
+            var t2 = new Table(1);
+            t2.SetWidth(width);
+            t2.SetFixedLayout();
+
+            var c2 = new Cell();
+            c2.SetTextAlignment(TextAlignment.CENTER);
+            c2.SetWidth(width);
+            c2.SetBorder(Border.NO_BORDER);
+            c2.Add(new Paragraph("Row Height: " + heightStr));
+
+            t2.AddCell(c2);
+            t2.SetFixedPosition((float)36, (float)y - 18, width);
+
+            doc.Add(t2);
+        }
+    }
+}
